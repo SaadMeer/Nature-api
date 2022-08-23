@@ -1,110 +1,99 @@
-const fs = require('fs');
 const express = require('express');
-const { json } = require('express');
+const morgan = require('morgan');
+
+const tourRouter = require('./routes/tourRoutes');
+const userRouter = require('./routes/userRoutes');
 
 const app = express();
 
-//middleware isa function that can modify the incoming request data
+// 1) MIDDLEWARES
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'));
+}
+
 app.use(express.json());
+app.use(express.static(`${__dirname}/public`));
 
-// app.get('/', (req, res) => {
-//     res.status(200).json({message: 'Hello from the server!', app: 'Natours  '})
-// })
-
-// app.post('/', (req, res) => {
-//     res.send('You can post to this endpoint..');
-// })
-const tours = JSON.parse(
-  fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
-);
-
-//get request
-app.get('/api/v1/tours', (req, res) => {
-  res.status(200).json({
-    status: 'success',
-    results: tours.length,
-    data: {
-      tours: tours,
-    },
-  });
+app.use((req, res, next) => {
+  console.log('Hello from the middleware 👋');
+  next();
 });
 
-app.get('/api/v1/tours/:id', (req, res) => {
-  // console.log(req.params);
-  //ttrick to change sting to number
-  const id = req.params.id * 1;
-  const tour = tours.find((el) => el.id === id);
-
-  // if(id > tours.length){
-  if (!tour) {
-    return res.status(404).json({
-      status: 'success',
-      message: 'Invalid ID',
-    });
-  }
-
-  res.status(200).json({
-    status: 'success',
-    data: {
-      tours: tour,
-    },
-  });
+app.use((req, res, next) => {
+  req.requestTime = new Date().toISOString();
+  next();
 });
 
-//post request to post data
-app.post(`/api/v1/tours`, (req, res) => {
-  // console.log(req.body);
-  const newId = tours[tours.length - 1].id + 1;
-  //to create a new object and merge it
-  const newTour = Object.assign({ id: newId }, req.body);
+// 3) ROUTES
+app.use('/api/v1/tours', tourRouter);
+app.use('/api/v1/users', userRouter);
 
-  tours.push(newTour);
+module.exports = app;
 
-  fs.writeFile(
-    `${__dirname}/dev-data/data/tours-simple.json`,
-    JSON.stringify(tours),
-    (err) => {
-      res.status(201).json({
-        status: 'success',
-        data: {
-          tours: newTour,
-        },
-      });
-    }
-  );
-});
 
-//patch request to update data
-app.patch('/api/v1/tours/:id', (req, res) => {
-  if (req.params.id * 1 > tours.length) {
-    res.status(404).json({
-      status: 'fail',
-      message: 'Invalid ID',
-    });
-  }
 
-  res.status(200).json({
-    status: 'success',
-    data: '<Updated tour here...>',
-  });
-});
 
-// //Delete method
-// app.delete('/api/v1/tours/:id', (req, res) => {
-//   if (req.params.id * 1 > tours.length) {
-//     res.status(404).json({
-//       status: 'fail',
-//       message: 'Invalid ID',
-//     });
-//   }
 
-//   res.status(204).json({
-//     status: 'success',
-//     data: '<Updated tour here...>',
-//   });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// const express = require('express');
+// const morgan = require('morgan');
+
+// const tourRouter = require('./routes/tourRoutes');
+// const userRouter = require('./routes/userRoutes');
+
+// const app = express();
+// //middleware isa function that can modify the incoming request data
+
+// // 1) MIDDLEWARES
+// app.use(morgan('dev'));
+// app.use(express.json());
+
+// app.use((req, res, next) => {
+//   console.log('Hello for the middleware');
+//   next();
 // });
 
-const port = 3000;
-app.listen(port, '127.0.0.1', () => {
-  console.log(`App running on port ${port}`);
-});
+// app.use((req, res, next) => {
+//   req.requestTime = new Date().toISOString();
+//   next();
+// });
+
+// //get request
+// // app.get('/api/v1/tours', getAllTours);
+// // app.get('/api/v1/tours/:id', getTour);
+// //post request to post data
+// // app.post(`/api/v1/tours`, createTour);
+// //patch request to update data
+// // app.patch('/api/v1/tours/:id', updateTour);
+// //Delete method
+// // app.delete('/api/v1/tours/:id', deleteTour);
+
+// //RouteMiddle and Mounting
+// app.use('/api/v1/tours', tourRouter);
+// app.use('/api/v1/users', userRouter);
+
+// //4) Start Server
+// const port = 3000;
+// app.listen(port, '127.0.0.1', () => {
+//   console.log(`App running on port ${port}`);
+// });
