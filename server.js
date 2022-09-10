@@ -3,8 +3,11 @@ const mongoose = require('mongoose')
 const dotenv = require('dotenv');
 
 dotenv.config({ path: './config.env' });
+<<<<<<< HEAD
 const app = require('./app');
 
+=======
+>>>>>>> refs/remotes/origin/main
 const DB = process.env.DATABASE.replace('<PASSWORD>', process.env.DATABASE_PASSWORD);
 // console.log(process.env);
 // .connect(process.env.DATABASE_LOCAL, { this is for local data base

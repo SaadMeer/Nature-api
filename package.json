@@ -21,7 +21,10 @@
     "express": "^4.18.1",
     "mongoose": "^5.13.15",
     "morgan": "^1.10.0",
+<<<<<<< HEAD
     "nodemon": "^2.0.19",
+=======
+>>>>>>> refs/remotes/origin/main
     "prettier": "^2.7.1"
   },
   "devDependencies": {
